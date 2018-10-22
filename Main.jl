@@ -11,49 +11,57 @@ function main()
     io::Dict = variaveisDict["io"]
 
     #Informações sobre as placas.
-    potenciaMaximaPainel = placa["Pmaxe"]
-    tensaoCircuitoAberto = parse(Float16, placa["Vocn"])
-    correnteCurtoCircuito = placa["Iscn"]
-    tensaoMaximaPotencia = parse(Float16, placa["Vmp"])
-    correnteMaximaPotencia = parse(Float16, placa["Imp"])
-    coeficienteCorrente = placa["KI"]
-    coeficienteTensao = placa["KV"]
+    potenciaMaximaPainel = parse(Int,placa["Pmaxe"])
+    tensaoCircuitoAberto = parse(Float64, placa["Vocn"])
+    correnteCurtoCircuito = parse(Float64, placa["Iscn"])
+    tensaoMaximaPotencia = parse(Float64, placa["Vmp"])
+    correnteMaximaPotencia = parse(Float64, placa["Imp"])
+    coeficienteCorrente = parse(Float64, placa["KI"])
+    coeficienteTensao = parse(Float64,placa["KV"]) * tensaoCircuitoAberto
     coeficientePotencia = placa["KP"]
-    coeficienteDiodo = placa["a"]
-    numeroCelulasSerie = placa["Ns"]
+    coeficienteDiodo = parse(Float64, placa["a"])
+    numeroCelulasSerie = parse(Int,placa["Ns"])
 
     #Informações sobre ambiente.
-    temperaturaOperacaoSTC = ambiente["Tn"]
-    temperaturaOperacaoPainel =  ambiente["T"]
+    temperaturaOperacaoSTC = parse(Int,ambiente["Tn"])
+    temperaturaOperacaoPainel =  parse(Int,ambiente["T"])
     variacaoTemperatura = ambiente["dT"]
-    temperaturaNominalKelvin = ambiente["Tkn"]
-    temperaturaKelvin = ambiente["Tk"]
-    irradiacaoTestes = ambiente["G"]
-    irradiacaoSTC = ambiente["Gn"]
+    temperaturaNominalKelvin = parse(Float64,ambiente["Tkn"])
+    temperaturaKelvin = parse(Float64,ambiente["Tk"])
+    irradiacaoTestes = parse(Int,ambiente["G"])
+    irradiacaoSTC = parse(Int,ambiente["Gn"])
 
     #Informações sobre físicas.
-    boltzman = fisico["k"]
-    electron = fisico["q"]
-    tensaoTermicaNominal = fisico["Vtn"]
-    tensaoTermica = fisico["Vt"]
+    boltzman = parse(Float64, fisico["k"])
+    electron = parse(Float64, fisico["q"])
+    tensaoTermicaNominal::Float64 = (boltzman*temperaturaNominalKelvin)/electron
+    tensaoTermica = (boltzman * temperaturaKelvin) / electron
 
     #Informações iniciais
-    rs = iniciais["Rs"]
-    rs_max::Float16 =  (tensaoCircuitoAberto - tensaoMaximaPotencia)/correnteMaximaPotencia 
+    rs = parse(Int, iniciais["Rs"])
+    rs_max::Float64 =  (tensaoCircuitoAberto - tensaoMaximaPotencia)/correnteMaximaPotencia 
     rp_min = iniciais["Rp_min"]
-    rp::Float16 = tensaoMaximaPotencia/(correnteCurtoCircuito-correnteMaximaPotencia) - rs_max
+    rp::Float64 = tensaoMaximaPotencia/(correnteCurtoCircuito-correnteMaximaPotencia) - rs_max
 
     #Cálculo de IO
-    ion = io["Io"]
     erro = io["erro"]
-    tolerancia::Float16 = parse(Float16,io["tol"])
-    iteracao = io["n"]
+    tolerancia::Float64 = parse(Float64,io["tol"])
+    cont = 0
     passoVetor = io["nv"]
-    incrementoIteracao = io["Rs_inc"]
+    incrementoIteracao = parse(Float64, io["Rs_inc"])
 
     # erro = Inf
     while rp > 0 #erro > tolerancia && 
-        
+       cont = cont + 1
+       correnteIpcNominal = (rs+rp)/rp * correnteCurtoCircuito
+       correnteIpvAtual::Float64 = correnteIpcNominal + (coeficienteCorrente * (temperaturaOperacaoSTC + temperaturaOperacaoPainel)) * irradiacaoTestes/irradiacaoSTC
+       correnteCurtoCircuitoAtual = correnteCurtoCircuito + (coeficienteCorrente * (temperaturaOperacaoSTC + temperaturaOperacaoPainel)) * irradiacaoTestes/irradiacaoSTC
+       ion::Float64 = (correnteCurtoCircuito+coeficienteCorrente*(temperaturaOperacaoPainel - temperaturaOperacaoSTC))/(exp((tensaoCircuitoAberto+coeficienteTensao*(temperaturaOperacaoPainel - temperaturaOperacaoSTC))/(numeroCelulasSerie*coeficienteDiodo*tensaoTermica))-1); 
+       rpAnterior = rp
+       rs = rs + incrementoIteracao
+       rp = tensaoMaximaPotencia*(tensaoMaximaPotencia+correnteMaximaPotencia*rs)/(tensaoMaximaPotencia*correnteIpvAtual-tensaoMaximaPotencia*ion*exp((tensaoMaximaPotencia+correnteMaximaPotencia*rs)/tensaoTermicaNominal/numeroCelulasSerie/coeficienteDiodo)+tensaoMaximaPotencia*ion-
+       potenciaMaximaPainel);
+       println(rp)
     end
 end
 
