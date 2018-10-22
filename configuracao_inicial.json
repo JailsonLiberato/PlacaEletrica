@@ -1,0 +1,43 @@
+{
+    "placa":{
+      "Pmaxe":"130",
+      "Vocn":"21.5",
+      "Iscn":"7.99",
+      "Vmp":"17.4",
+      "Imp":"7.49",
+      "KI":"0.034/100",
+      "KV":"-0.34/100*Vocn",
+      "KP":"-0.48",
+      "a":"1.35",
+      "Ns":"36"
+    },
+    "ambiente":{
+      "Tn":"25",
+      "T":"25",
+      "dT":"T-Tn",
+      "Tkn":"Tn+273.15",
+      "Tk":"T+273.15",
+      "G":"1000",
+      "Gn":"1000"
+    },
+    "fisico":{
+      "k":"1.38064852e-23",
+      "q":"1.60217662e-19",
+      "Vtn":"k*Tkn/q",
+      "Vt":"k*Tk/q"
+    },
+    "iniciais":{
+      "Rs": "0",
+      "Rs_max": "(Vocn - Vmp)/ Imp",
+      "Rp_min":"Vmp/(Iscn-Imp) - Rs_max",
+      "Rp":"Rp_min"
+    },
+    "io":{
+      "Io":"(Iscn+KI*dT)/(exp((Vocn+KV*dT)/(Ns*a*Vt))-1)", 
+      "erro":"inf",
+      "tol":".6",
+      "n":"0",
+      "nv":"500",
+      "Rs_inc":"0.01"
+    }
+  }

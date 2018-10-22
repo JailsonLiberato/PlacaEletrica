@@ -1,5 +1,6 @@
 import JSON
 
+#Example
 function writeJSON()
     dict1 = Dict("param1" => 1, "param2" => 2,
             "dict" => Dict("d1"=>1.,"d2"=>1.,"d3"=>1.))
@@ -11,14 +12,11 @@ function writeJSON()
 
 end
 
-function readJSON()
-    dict2 = Dict()
-    open("write_read.json", "r") do f
-        global dict2
+function readJSON(filename::String)::Dict
+    open(filename, "r") do f
         dicttxt = readstring(f) 
-        dict2=JSON.parse(dicttxt) 
-        println(dict2["param2"])
+        dict=JSON.parse(dicttxt)
+        return dict 
     end
     
-    println(dict2)
 end
