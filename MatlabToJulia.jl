@@ -52,7 +52,7 @@ function execute()
     Io = 0
     V = []
     I = []
-    n = 0 
+    n = 0
     Pmaxc = 0
     while (erro>tol) && (Rp > 0)
         n = n + 1; #incremento iteração
@@ -77,7 +77,7 @@ function execute()
                 loop_value = g(j)
             end
         end
-        P = (Ipv-Io*(exp.((V+I.*Rs)/Vt/Ns/a)-1)-(V+I.*Rs)/Rp).*V; #Calcula P através da curva I-V
+        P = (Ipv.-Io*(exp.((V+I.*Rs)/Vt/Ns/a).-1)-(V+I.*Rs)/Rp).*V; #Calcula P através da curva I-V
         Pmaxc = maximum(P); #Acha maior ponto de P
         erro = (Pmaxc-Pmaxe) #calcula erro entre Pmax e Pmaxe
         #Variáveis locais ao loop
@@ -118,4 +118,3 @@ function execute()
     #plot(x = V,y = I)
     #plot(x = V,y = P)
 end
-
