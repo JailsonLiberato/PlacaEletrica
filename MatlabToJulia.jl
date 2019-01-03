@@ -1,9 +1,18 @@
+using Pkg
 using Plots
+using IntervalArithmetic
+using IntervalOptimisation
 
 function plot_graph()
     x = 1:10; y = rand(10); # These are the plotting data
     p = plot(x,y)
     savefig(p,"myplot.pdf") # Saves the plot from p as a .pdf vector graphic
+end
+
+function minimize()
+    global_min, minimisers = minimise(x -> (x^2 - 2)^2, -10..11);
+    print(global_min)
+
 end
 
 function execute()
@@ -117,4 +126,5 @@ function execute()
     V = collect(V)
     #plot(x = V,y = I)
     #plot(x = V,y = P)
+    minimize()
 end
