@@ -10,7 +10,11 @@ function plot_graph()
 end
 
 function minimize()
-    global_min, minimisers = minimise(x -> (x^2 - 2)^2, -10..11);
+    # X = [I_ph 1, I_sd 2, η 3, R_s 4, R_sh 5, V 6, I 7]
+    # I_ph - (V + R_s * I)/R_sh - I_sd * (exp(q * (V + R_s * I)/(η * K-B * T))-1)
+    I_test(X) = X[1] - (X[6] + X[4] * X[7])/X[5] - X[2] * (exp(q * (X[6] + X[4] * X[7])/(X[3] + k * T)) - 1)
+    global_min, minimisers = @time minimise(I_test, IntervalBox(0..1, 7) )
+    #   Função consome mais de 8 GB de memória, descorbrir porque.
     print(global_min)
 
 end
