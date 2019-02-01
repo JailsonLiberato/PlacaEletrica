@@ -14,7 +14,6 @@ function minimize()
     # I_ph - (V + R_s * I)/R_sh - I_sd * (exp(q * (V + R_s * I)/(η * K-B * T))-1)
     I_test(X) = X[1] - (X[6] + X[4] * X[7])/X[5] - X[2] * (exp(q * (X[6] + X[4] * X[7])/(X[3] + k * T)) - 1)
     global_min, minimisers = @time minimise(I_test, IntervalBox(0..1, 7) )
-    #   Função consome mais de 8 GB de memória, descorbrir porque.
     print(global_min)
 
 end
@@ -130,5 +129,53 @@ function execute()
     V = collect(V)
     #plot(x = V,y = I)
     #plot(x = V,y = P)
-    minimize()
+end
+
+
+function part1(v::T, rs::T, i::T, rsh::T) where T<:Number
+    (v+rs*i)/rsh
+end
+
+function part2(v::T, rs::T, i::T, isd::T, η::T) where T<:Number
+    isd*(exp(1.60217662e-19 * (v+rs*i)/(η * 1.38064852e-23 * 25)))
+end
+
+function rs_value(rs, V)
+    results = fill(0., size(V))
+    for i in 1:size(V)
+        results[i] = 7.99 - part1(V[i], rs, 1, 108.9) -
+        part2(V[i], rs, 1, 2.658636487910122e-7, 1)
+    end
+end
+
+function rsh_value(rsh, V)
+    results = fill(0., size(V))
+    for i in 1:size(V)
+        results[i] = 7.99 - part1(V[i], .03, 1, rsh) -
+        part2(V[i], .03, 1, 2.658636487910122e-7, 1)
+    end
+end
+
+function iph_value(iph, V)
+    results = fill(0., size(V))
+    for i in 1:size(V)
+        results[i] = iph - part1(V[i], .03, 1, 108.9) -
+        part2(V[i], .03, 1, 2.658636487910122e-7, 1)
+    end
+end
+
+function isd_value(isd, V)
+    results = fill(0., size(V))
+    for i in 1:size(V)
+        results[i] = 7.99 - part1(V[i], .03, 1, 108.9) -
+        part2(V[i], .03, 1, isd, 1)
+    end
+end
+
+function η_value(rs, V)
+    results = fill(0., size(V))
+    for i in 1:size(V)
+        results[i] = 7.99 - part1(V[i], .03, 1, 108.9) -
+        part2(V[i], .03, 1, 2.658636487910122e-7, η)
+    end
 end
